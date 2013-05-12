@@ -1,0 +1,65 @@
+<meta name="viewport" content="width=device-width" />
+<link rel="stylesheet" href="/css/vendor/leaflet.css" />
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+  }
+  #map {
+    height: 100%;
+  }
+  #debug {
+    position: absolute;
+    bottom: 0;
+    background: rgba(245, 245, 245, 0.7);
+    padding: 2px 5px;
+  }
+</style>
+<script src="/js/vendor/leaflet-src.js"></script>
+<script>
+  var main = function(){
+    log("hello world")
+
+    L.Icon.Default.imagePath = "/imgs/vendor/leaflet"
+
+    var map = L.map('map').setView([51.505, -0.09], 13)
+
+    L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      {
+        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>  contributors',
+        maxZoom: 18
+      }
+    ).addTo(map)
+
+    map.locate({setView: true, maxZoom: 16, timeout: 100000})
+
+    var location_found = function(e) {
+      var radius = e.accuracy / 2;
+
+      L.marker(e.latlng).addTo(map)
+          .bindPopup("You are within " + radius + " meters from this point").openPopup()
+
+      L.circle(e.latlng, radius).addTo(map)
+    }
+
+    var location_error = function(e) {
+      log(e.message)
+    }
+
+    map.on('locationfound', location_found)
+    map.on('locationerror', location_error)
+
+    // var map_div = document.getElementById("map")
+    // map_div.style.height = 500
+    // map.invalidateSize()
+  }
+
+  var log = function(string){
+    var debug = document.getElementById("debug")
+    debug.innerHTML = debug.innerHTML+string+"<br>"
+  }
+
+  document.addEventListener("DOMContentLoaded", main, false)
+</script>
+<div id="map"></div>
+<div id="debug"></div>
